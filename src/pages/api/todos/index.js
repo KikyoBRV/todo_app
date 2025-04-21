@@ -1,29 +1,28 @@
 import dbConnect from '../../../lib/mongodb';
 import Todo from '../../../models/Todo';
-import { mockUser } from '../../../lib/auth';
+import { verifyToken } from '../../../lib/auth';
 
 export default async function handler(req, res) {
   await dbConnect();
+  
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  
+  try {
+    const { id: userId } = verifyToken(token);
 
-  if (req.method === 'GET') {
-    try {
-      const todos = await Todo.find({ userId: mockUser.id }); // Fetch todos for the mock user
+    if (req.method === 'GET') {
+      const todos = await Todo.find({ user: userId }).populate('user', 'email');
       res.status(200).json(todos);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  } else if (req.method === 'POST') {
-    try {
+    } else if (req.method === 'POST') {
       const { title } = req.body;
-      const todo = await Todo.create({ 
-        title, 
-        userId: mockUser.id,
-      });
-      res.status(201).json(todo);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+      const todo = await Todo.create({ title, user: userId });
+      const populatedTodo = await Todo.findById(todo._id).populate('user', 'email');
+      res.status(201).json(populatedTodo);
+    } else {
+      res.status(405).end();
     }
-  } else {
-    res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 }
