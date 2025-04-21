@@ -28,10 +28,10 @@ npm install
 #### 3.1 Create Environment File
 ```bash
 # On MacOS/Linux
-cp .env.local.example .env.local
+.env.local.example .env.local
 
 # On Windows (Command Prompt)
-copy .env.local.example .env.local
+.env.local.example .env.local
 ```
 
 #### 3.2 Configure MongoDB
@@ -86,9 +86,9 @@ src/
 └── styles/        # CSS files
 ```
 
-## Deployment Options
+## Deployment
 
-### 1. Docker Deployment
+### Docker Deployment
 ```bash
 docker build -t todo-app .
 docker run -p 3000:3000 --env-file .env.local todo-app
