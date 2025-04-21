@@ -34,37 +34,48 @@ cp .env.local.example .env.local
 copy sample.env.local .env.local
 ```
 
-#### 3.2 Configure MongoDB
+#### 3.2 Configure Docker & MongoDB
+1. Install Docker. https://www.docker.com/get-started/ (In case you don't have Docker Desktop)
+
+2. Install MongoDB Compass. https://www.mongodb.com/try/download/compass
+
+3. Open Terminal/PowerShell.
+
+4. Execute the command to run the image as a container. Execute the command to run the image as a container.
+```
+docker run --name mongo -p 27017:27017 -d mongodb/mongodb-community-server:latest
+```
+5. Execute the command to verify that the container is running.
+```
+docker container ls
+// You should see one mongodb/mongodb-community-server container running.
+```
+6. Open MongoDB application and connect to your MongoDB instance at mongodb://localhost:27017, which is the default value. 
+    - click "+" which is "Add new connection"
+    - Click "save & connect"
+
+   Verify that the connection is successful and three default databases are visible: admin, config, and local.
+
 Edit `.env.local` and set your MongoDB connection string:
 ```bash
 MONGODB_URI=mongodb://localhost:27017/todoapp
 JWT_SECRET=your-secure-secret-key-here
 ```
+Edit the JWT_SECRET by going to https://jwtsecret.com/generate. Set the "Secret Length" to 32, then click "Generate." Copy the generated secret and replace the current JWT_SECRET with it.
 
-### 4. Database Setup
-Ensure MongoDB is running:
+### 4. Run the Application
 ```bash
-# For local MongoDB
-mongod
-```
-
-### 5. Run the Application
-```bash
-# Development mode
-pnpm dev
-
-# Or with npm
 pnpm run dev
 ```
 
-### 6. Access the Application
+### 5. Access the Application
 Open your browser and visit:
 ```
 http://localhost:3000
 ```
 
 ## Testing Credentials
-You can try signup USER as this format or other email password as you want.
+You can try signing up a user with this format, or use any email and password you prefer.
 - Email: `test@example.com`
 - Password: `password123`
 
@@ -73,59 +84,39 @@ You can try signup USER as this format or other email password as you want.
 - Create todos with title, description, and due date
 - Mark todos as complete/in progress
 - Edit existing todos
-- Responsive design
+- Responsive design with a calendar that shows how many tasks each date has, based on the tasks' due dates.
 
 ## Project Structure
 ```
 src/
-├── components/    # React components
-├── lib/           # Utility functions
-├── models/        # MongoDB models
-├── pages/         # Next.js pages and API routes
-├── public/        # Static files
-└── styles/        # CSS files
-```
-
-## Deployment
-
-### Docker Deployment
-```bash
-docker build -t todo-app .
-docker run -p 3000:3000 --env-file .env.local todo-app
-```
-
-## Troubleshooting
-
-### MongoDB Connection Issues
-1. Verify MongoDB is running:
-```bash
-mongosh --eval "db.runCommand({ping: 1})"
-```
-2. Check connection string in `.env.local`
-
-### Authentication Problems
-1. Clear cookies and try again
-2. Verify JWT_SECRET in `.env.local` matches between server restarts
-
-### Development Issues
-```bash
-# Clear Next.js cache
-pnpm next dev --clear
-
-# Reinstall dependencies
-rm -rf node_modules
-pnpm install
-```
-
-## Additional Commands
-```bash
-# Run production build
-pnpm build
-pnpm start
-
-# Run linter
-pnpm lint
-
-# Run tests (if available)
-pnpm test
+├── components/            # React components
+│   ├── Calendar.js        # Calendar component
+│   └── EditTodoModal.js   # Todo editing modal
+│
+├── context/               # React context providers
+│   └── AuthContext.js     # Authentication context
+│
+├── lib/                   # Utility functions
+│   ├── auth.js            # Authentication helpers
+│   └── mongodb.js         # MongoDB connection
+│
+├── models/                # MongoDB models
+│   ├── Todo.js            # Todo model/schema
+│   └── User.js            # User model/schema
+│
+├── pages/                 # Next.js pages and API routes
+│   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   ├── todos/         # Todo endpoints
+│   │   └── hello.ts       # Test endpoint
+│   │
+│   ├── _app.js            # Custom App component
+│   ├── _document.js       # Custom Document component
+│   ├── index.js           # Home page
+│   ├── login.js           # Login page
+│   └── signup.js          # Signup page
+│
+└── styles/                # CSS files
+    ├── Auth.module.css    # CSS Modules for auth
+    └── globals.css        # Global styles
 ```
