@@ -12,13 +12,17 @@ export default async function handler(req, res) {
     const { id: userId } = verifyToken(token);
 
     if (req.method === 'GET') {
-      const todos = await Todo.find({ user: userId }).populate('user', 'email');
+      const todos = await Todo.find({ user: userId }).sort({ dueDate: 1 });
       res.status(200).json(todos);
     } else if (req.method === 'POST') {
-      const { title } = req.body;
-      const todo = await Todo.create({ title, user: userId });
-      const populatedTodo = await Todo.findById(todo._id).populate('user', 'email');
-      res.status(201).json(populatedTodo);
+      const { title, description, dueDate } = req.body;
+      const todo = await Todo.create({ 
+        title, 
+        description, 
+        dueDate: dueDate ? new Date(dueDate) : null,
+        user: userId 
+      });
+      res.status(201).json(todo);
     } else {
       res.status(405).end();
     }
