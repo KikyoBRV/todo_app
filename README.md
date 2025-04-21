@@ -28,10 +28,10 @@ npm install
 #### 3.1 Create Environment File
 ```bash
 # On MacOS/Linux
-.env.local.example .env.local
+cp .env.local.example .env.local
 
 # On Windows (Command Prompt)
-.env.local.example .env.local
+copy sample.env.local .env.local
 ```
 
 #### 3.2 Configure MongoDB
@@ -54,7 +54,7 @@ mongod
 pnpm dev
 
 # Or with npm
-npm run dev
+pnpm run dev
 ```
 
 ### 6. Access the Application

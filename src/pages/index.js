@@ -161,7 +161,7 @@ export default function Home() {
 
       <header className="app-header">
         <div className="header-content">
-          <h1>TaskMaster</h1>
+          <h1>TodoApp</h1>
           {currentUser && (
             <div className="user-profile">
               <div className="avatar">{currentUser.email.charAt(0).toUpperCase()}</div>
