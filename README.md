@@ -86,6 +86,84 @@ You can try signing up a user with this format, or use any email and password yo
 - Edit existing todos
 - Responsive design with a calendar that shows how many tasks each date has, based on the tasks' due dates.
 
+##  Framework
+**Next.js** (Full-stack React framework) with:
+- **Pages Router** (`/pages` structure)
+- **API Routes** (Backend endpoints)
+- **React 18** (Components/hooks)
+- **Context API** (Global state management)
+
+## Database
+**MongoDB** (NoSQL document database)
+
+### Collections Structure:
+```javascript
+// users collection
+{
+  _id: ObjectId,
+  email: String,        // Unique
+  password: String,     // bcrypt-hashed
+  createdAt: DateTime
+}
+
+// todos collection 
+{
+  _id: ObjectId,
+  title: String,
+  description: String,
+  status: String,       // ['In Progress', 'Done', 'Overdue']
+  dueDate: DateTime,
+  userId: ObjectId,     // Reference to users
+  createdAt: DateTime
+}
+```
+
+## Application Deployment
+
+### Local Development:
+```
+# 1. Install dependencies
+pnpm install
+
+# 2. Start MongoDB (via Docker)
+docker-compose up -d mongo
+
+# 3. Run dev server
+pnpm dev
+```
+## Code Explanation
+### Key Design Decisions:
+1. Authentication:
+    - JWT tokens stored in HTTP-only cookies
+    - Password hashing with bcryptjs
+    - Context API for user state management
+2. API Structure:
+```
+/api/auth/
+  ├── signup  (POST) - User registration
+  ├── login   (POST) - Session creation
+  └── logout  (POST) - Session invalidation
+
+/api/todos/
+  ├── [GET]    - List todos
+  ├── [POST]   - Create todo
+  └── /[id]
+      ├── [PUT]    - Update todo
+      └── [DELETE] - Remove todo
+```
+3.Frontend Architecture:
+- Component-based UI with:
+    - EditTodoModal: Controlled form with validation
+    - Calendar: Date picker integration
+- Client-side data fetching with axios
+- CSS Modules for scoped styling
+
+### Software Architecture:
+#### Layered Architecture with:
+- Presentation Layer: React components
+- Application Layer: Next.js API routes
+- Data Layer: MongoDB models
+
 ## Project Structure
 ```
 src/
@@ -120,3 +198,20 @@ src/
     ├── Auth.module.css    # CSS Modules for auth
     └── globals.css        # Global styles
 ```
+## Layered Architecture Diagram
+
+![Alt text describing the image](./image/Todo_app_diagram.png)
+
+### Layer Breakdown:
+#### 1. Presentation Layer (Pink)
+- Next.js pages (/pages/*)
+- Handles UI rendering and user interactions
+#### 2. Application Layer (Blue)
+- API Routes (/pages/api/*)
+- Contains business logic and request handling
+#### 3. Data Layer (Light Blue)
+- MongoDB models (/models/*)
+- Manages data persistence and queries
+#### 4. Component Layer (Purple)
+- React components (/components/*)
+- Context providers for state management
