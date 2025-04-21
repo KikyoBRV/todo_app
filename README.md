@@ -1,6 +1,3 @@
-Here's the complete `README.md` in a single copyable block:
-
-```markdown
 # Todo Application with Next.js and MongoDB
 
 ## Prerequisites
