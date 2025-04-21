@@ -5,6 +5,7 @@ import axios from "axios"
 import { useRouter } from "next/router"
 import { parseCookies } from "nookies"
 import EditTodoModal from "../components/EditTodoModal"
+import Calendar from "../components/Calendar"
 
 export async function getServerSideProps(context) {
   const { token } = parseCookies(context)
@@ -175,6 +176,9 @@ export default function Home() {
       </header>
 
       <main className="main-content">
+        {/* Calendar Component */}
+        <Calendar todos={todos} />
+
         <div className="todo-header">
           <h2>My Tasks</h2>
           <button className="add-todo-btn" onClick={() => setIsFormVisible(!isFormVisible)}>

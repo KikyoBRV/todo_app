@@ -1,66 +1,83 @@
 "use client"
 
 import { useState } from "react"
-import axios from "axios"
-import { useRouter } from "next/router"
 
-const EditTodoModal = ({ todo, onClose, onUpdate }) => {
+export default function EditTodoModal({ todo, onClose, onUpdate }) {
   const [title, setTitle] = useState(todo.title)
   const [description, setDescription] = useState(todo.description)
-  const [dueDate, setDueDate] = useState(todo.dueDate || "")
-  const router = useRouter()
+  const [dueDate, setDueDate] = useState(todo.dueDate ? todo.dueDate.substring(0, 10) : "")
+  const [status, setStatus] = useState(todo.status)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     try {
-      const updatedTodo = { ...todo, title, description, dueDate }
-      await axios.put(`/api/todos/${todo._id}`, updatedTodo)
-      onUpdate(updatedTodo)
-      onClose()
-    } catch (error) {
-      if (error.response?.status === 401) {
-        router.push("/login")
+      const res = await fetch(`/api/todos/${todo._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          dueDate,
+          status,
+        }),
+      })
+
+      if (res.ok) {
+        const updatedTodo = await res.json()
+        onUpdate(updatedTodo)
+        onClose()
       } else {
         alert("Failed to update todo")
       }
+    } catch (error) {
+      console.error("Update error:", error)
+      alert("Failed to update todo")
     }
   }
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-backdrop">
       <div className="modal">
         <div className="modal-header">
           <h2>Edit Task</h2>
           <button onClick={onClose} className="close-btn">
-            &times;
+            <span className="icon">❌</span>
           </button>
         </div>
-        <div className="modal-body">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="title">Title</label>
-              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="dueDate">Due Date</label>
-              <input type="date" id="dueDate" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-            </div>
-            <div className="form-actions">
-              <button type="submit" className="submit-btn">
-                Update
-              </button>
-              <button type="button" onClick={onClose} className="cancel-btn">
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-group">
+            <label htmlFor="title">Task Title</label>
+            <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="dueDate">Due Date</label>
+            <input type="date" id="dueDate" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="In Progress">In Progress</option>
+              <option value="Done">Done</option>
+            </select>
+          </div>
+          <div className="form-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">
+              Cancel
+            </button>
+            <button type="submit" className="submit-btn">
+              Update Task
+            </button>
+          </div>
+        </form>
         <style jsx>{`
-          .modal-overlay {
+          .modal-backdrop {
             position: fixed;
             top: 0;
             left: 0;
@@ -76,16 +93,18 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
           .modal {
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 500px;
-            max-width: 90%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
           }
 
           .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 1px solid #eaeaea;
           }
 
@@ -99,30 +118,37 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #666;
+            color: #6b7280;
           }
 
-          .modal-body {
-            padding: 20px;
+          .modal-form {
+            display: flex;
+            flex-direction: column;
           }
 
           .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
           }
 
           .form-group label {
-            display: block;
-            margin-bottom: 5px;
             font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
           }
 
           .form-group input,
-          .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+          .form-group textarea,
+          .form-group select {
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .form-group textarea {
+            min-height: 100px;
           }
 
           .form-actions {
@@ -136,7 +162,7 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
           .cancel-btn {
             padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
           }
@@ -148,12 +174,10 @@ const EditTodoModal = ({ todo, onClose, onUpdate }) => {
 
           .cancel-btn {
             background-color: #f3f4f6;
-            color: #333;
+            color: #4b5563;
           }
         `}</style>
       </div>
     </div>
   )
 }
-
-export default EditTodoModal
