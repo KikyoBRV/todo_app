@@ -1,40 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+Here's the complete `README.md` in a single copyable block:
 
-## Getting Started
+```markdown
+# Todo Application with Next.js and MongoDB
 
-First, run the development server:
+## Prerequisites
+- Node.js 18.x or higher
+- MongoDB (local instance or MongoDB Atlas)
+- Git
+- pnpm (recommended) or npm/yarn
 
+## Installation Steps
+
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/KikyoBRV/todo_app.git
+cd todo_app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+# Using pnpm (recommended)
+pnpm install
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+# Or using npm
+npm install
+```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### 3. Environment Setup
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+#### 3.1 Create Environment File
+```bash
+# On MacOS/Linux
+cp .env.local.example .env.local
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# On Windows (Command Prompt)
+copy .env.local.example .env.local
+```
 
-## Learn More
+#### 3.2 Configure MongoDB
+Edit `.env.local` and set your MongoDB connection string:
+```bash
+MONGODB_URI=mongodb://localhost:27017/todoapp
+JWT_SECRET=your-secure-secret-key-here
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Database Setup
+Ensure MongoDB is running:
+```bash
+# For local MongoDB
+mongod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+### 5. Run the Application
+```bash
+# Development mode
+pnpm dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Or with npm
+npm run dev
+```
 
-## Deploy on Vercel
+### 6. Access the Application
+Open your browser and visit:
+```
+http://localhost:3000
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Testing Credentials
+You can try signup USER as this format or other email password as you want.
+- Email: `test@example.com`
+- Password: `password123`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Key Features
+- User authentication (Signup/Login/Logout)
+- Create todos with title, description, and due date
+- Mark todos as complete/in progress
+- Edit existing todos
+- Responsive design
+
+## Project Structure
+```
+src/
+├── components/    # React components
+├── lib/           # Utility functions
+├── models/        # MongoDB models
+├── pages/         # Next.js pages and API routes
+├── public/        # Static files
+└── styles/        # CSS files
+```
+
+## Deployment Options
+
+### 1. Docker Deployment
+```bash
+docker build -t todo-app .
+docker run -p 3000:3000 --env-file .env.local todo-app
+```
+
+## Troubleshooting
+
+### MongoDB Connection Issues
+1. Verify MongoDB is running:
+```bash
+mongosh --eval "db.runCommand({ping: 1})"
+```
+2. Check connection string in `.env.local`
+
+### Authentication Problems
+1. Clear cookies and try again
+2. Verify JWT_SECRET in `.env.local` matches between server restarts
+
+### Development Issues
+```bash
+# Clear Next.js cache
+pnpm next dev --clear
+
+# Reinstall dependencies
+rm -rf node_modules
+pnpm install
+```
+
+## Additional Commands
+```bash
+# Run production build
+pnpm build
+pnpm start
+
+# Run linter
+pnpm lint
+
+# Run tests (if available)
+pnpm test
+```
