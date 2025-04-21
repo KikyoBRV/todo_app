@@ -29,7 +29,7 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.formCard}>
         <div className={styles.formHeader}>
-          <h1 className={styles.formTitle}>Welcome back</h1>
+          <h1 className={styles.formTitle}>Welcome to TodoApp</h1>
           <p className={styles.formDescription}>Enter your credentials to sign in to your account</p>
         </div>
 
