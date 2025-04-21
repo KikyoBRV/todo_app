@@ -1,141 +1,159 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/router';
+"use client"
 
-export default function EditTodoModal({ todo, onClose, onUpdate }) {
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    status: 'In Progress',
-    dueDate: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+import { useState } from "react"
+import axios from "axios"
+import { useRouter } from "next/router"
 
-  useEffect(() => {
-    if (todo) {
-      setFormData({
-        title: todo.title,
-        description: todo.description,
-        status: todo.status,
-        dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : ''
-      });
-    }
-  }, [todo]);
+const EditTodoModal = ({ todo, onClose, onUpdate }) => {
+  const [title, setTitle] = useState(todo.title)
+  const [description, setDescription] = useState(todo.description)
+  const [dueDate, setDueDate] = useState(todo.dueDate || "")
+  const router = useRouter()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
     try {
-      const response = await axios.put(`/api/todos/${todo._id}`, formData);
-      onUpdate(response.data);
-      onClose();
+      const updatedTodo = { ...todo, title, description, dueDate }
+      await axios.put(`/api/todos/${todo._id}`, updatedTodo)
+      onUpdate(updatedTodo)
+      onClose()
     } catch (error) {
       if (error.response?.status === 401) {
-        router.push('/login');
+        router.push("/login")
       } else {
-        alert('Failed to update todo');
+        alert("Failed to update todo")
       }
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  if (!todo) return null;
+  }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '8px',
-        width: '100%',
-        maxWidth: '500px'
-      }}>
-        <h2>Edit Todo</h2>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '8px' }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              style={{ width: '100%', padding: '8px', minHeight: '100px' }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              style={{ width: '100%', padding: '8px' }}
-            >
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
-            </select>
-          </div>
-          
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Due Date</label>
-            <input
-              type="date"
-              name="dueDate"
-              value={formData.dueDate}
-              onChange={handleChange}
-              style={{ width: '100%', padding: '8px' }}
-            />
-          </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{ padding: '8px 16px', backgroundColor: '#ccc' }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ padding: '8px 16px', backgroundColor: '#4CAF50', color: 'white' }}
-            >
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
-        </form>
+    <div className="modal-overlay">
+      <div className="modal">
+        <div className="modal-header">
+          <h2>Edit Task</h2>
+          <button onClick={onClose} className="close-btn">
+            &times;
+          </button>
+        </div>
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="title">Title</label>
+              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+            </div>
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="dueDate">Due Date</label>
+              <input type="date" id="dueDate" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="submit-btn">
+                Update
+              </button>
+              <button type="button" onClick={onClose} className="cancel-btn">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+        <style jsx>{`
+          .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+          }
+
+          .modal {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            max-width: 90%;
+          }
+
+          .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eaeaea;
+          }
+
+          .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+          }
+
+          .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+          }
+
+          .modal-body {
+            padding: 20px;
+          }
+
+          .form-group {
+            margin-bottom: 16px;
+          }
+
+          .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+          }
+
+          .form-group input,
+          .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+          }
+
+          .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+          }
+
+          .submit-btn,
+          .cancel-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+          }
+
+          .submit-btn {
+            background-color: #2563eb;
+            color: white;
+          }
+
+          .cancel-btn {
+            background-color: #f3f4f6;
+            color: #333;
+          }
+        `}</style>
       </div>
     </div>
-  );
+  )
 }
+
+export default EditTodoModal
